@@ -2,14 +2,15 @@ import { Screen, Cell, PixelPosition, Position } from "./Screen"
 import { DeltaRegionTracker } from "./DeltaRegionTracker"
 import { Grid } from "./Grid"
 import * as Config from "./Config"
+import * as Actions from "./Actions"
 
-const hexRgb = require("hex-rgb")
 
 export interface NeovimRenderer {
     start(element: HTMLElement);
     update(screenInfo: Screen, deltaRegionTracker: DeltaRegionTracker);
 
-    onResize(): void;
+    onScroll(screen, region, count): void
+    onResize(): void
 }
 
 export class CanvasRenderer implements NeovimRenderer {
@@ -19,6 +20,7 @@ export class CanvasRenderer implements NeovimRenderer {
     private _renderCache: RenderCache;
 
     private _lastRenderedCell: Grid<Cell> = new Grid<Cell>()
+    private _scrollRegion: any
 
     public start(element: HTMLCanvasElement): void {
         // Assert canvas
@@ -29,6 +31,27 @@ export class CanvasRenderer implements NeovimRenderer {
 
         this._renderCache = new RenderCache(this._canvasContext);
     }
+
+    public onScroll(screen, region, count): void {
+        // const fontWidth = screen.fontWidthInPixels
+        // const fontHeight = screen.fontHeightInPixels
+
+        // const x = region.left * fontHeight
+        // const y = region.top * fontWidth
+        // const width = region.right * fontWidth - x
+        // const height = region.bottom * fontHeight - y
+
+        // const imageData = this._canvasContext.getImageData(x, y, width, height)
+
+        // this._canvasContext.putImageData(imageData, x, y - (count * fontHeight))
+
+        // if (count > 0) {
+        //     this._canvasContext.clearRect(x, height - (count * fontHeight), width, count * fontHeight)
+        // } else {
+        //     this._canvasContext.clearRect(x, 0, width, -count * fontHeight)
+        // }
+    }
+
 
     public onResize(): void {
         var width = this._canvas.offsetWidth;
@@ -46,29 +69,23 @@ export class CanvasRenderer implements NeovimRenderer {
         const opacity = Config.getValue<number>("prototype.editor.backgroundOpacity")
 
         var cells = deltaRegionTracker.getModifiedCells()
-                    .forEach(pos => {
+            .forEach(pos => {
 
-                        var x = pos.x
-                        var y = pos.y
+                var x = pos.x
+                var y = pos.y
 
                 var drawX = x * fontWidth;
                 var drawY = y * fontHeight;
 
                 var cell = screenInfo.getCell(x, y);
 
-                if(cell) {
+                if (cell) {
                     var lastRenderedCell = this._lastRenderedCell.getCell(x, y)
 
-                    if(lastRenderedCell === cell)
+                    if (lastRenderedCell === cell)
                         return
 
-                    // const hexBackgroundColor = cell.backgroundColor || screenInfo.backgroundColor;
-                    // const rgb = hexRgb(hexBackgroundColor)
-                    // const backgroundColor = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${opacity})`
-
-                    // if (opacity < 1) {
-                        this._canvasContext.clearRect(drawX, drawY, fontWidth, fontHeight)
-                    // }
+                    this._canvasContext.clearRect(drawX, drawY, fontWidth, fontHeight)
 
                     const defaultBackgroundColor = "rgba(255, 255, 255, 0)"
                     let backgroundColor = defaultBackgroundColor
@@ -76,10 +93,10 @@ export class CanvasRenderer implements NeovimRenderer {
                     if (cell.backgroundColor && cell.backgroundColor !== screenInfo.backgroundColor)
                         backgroundColor = cell.backgroundColor
 
-                    if(cell.character !== "" && cell.character !== " ") {
+                    if (cell.character !== "" && cell.character !== " ") {
                         var foregroundColor = cell.foregroundColor ? cell.foregroundColor : screenInfo.foregroundColor
                         this._renderCache.drawText(cell.character, backgroundColor, foregroundColor, drawX, drawY, screenInfo.fontFamily, screenInfo.fontSize, fontWidth, fontHeight)
-                    } else if(backgroundColor !== defaultBackgroundColor) {
+                    } else if (backgroundColor !== defaultBackgroundColor) {
                         this._canvasContext.fillStyle = backgroundColor
                         this._canvasContext.fillRect(drawX, drawY, fontWidth, fontHeight)
                     }
@@ -104,7 +121,7 @@ export class RenderCache {
 
         var keyString = character + "_" + backgroundColor + "_" + color + "_" + fontFamily + "_" + fontSize;
 
-        if(!this._renderCache[keyString]) {
+        if (!this._renderCache[keyString]) {
             var canvas = document.createElement("canvas")
             canvas.width = fontWidth
             canvas.height = fontHeight

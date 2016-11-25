@@ -1,3 +1,4 @@
+- Scroll optimizations: Still need to consider better performance
 - Format on switch to whitespace
 
 - Remove multiple blank lines in row

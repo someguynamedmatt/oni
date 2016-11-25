@@ -1,6 +1,7 @@
 import * as Actions from "./actions"
 import { Grid } from "./Grid"
 import { DeltaRegionTracker } from "./DeltaRegionTracker"
+import { EventEmitter } from "events"
 
 export type Mode = "insert" | "normal";
 
@@ -58,7 +59,7 @@ export interface ScrollRegion {
     right: number
 }
 
-export class NeovimScreen implements Screen {
+export class NeovimScreen extends EventEmitter implements Screen {
 
     private _cursorRow: number = 0
     private _cursorColumn: number = 0
@@ -71,7 +72,7 @@ export class NeovimScreen implements Screen {
     private _fontSize: string = null;
     private _fontWidthInPixels: number;
     private _fontHeightInPixels: number;
-    
+
     private _mode: Mode = "normal";
     private _backgroundColor: string = "#000000"
     private _foregroundColor: string = "#00FF00"
@@ -83,6 +84,8 @@ export class NeovimScreen implements Screen {
     private _deltaTracker: DeltaRegionTracker;
 
     constructor(deltaTracker: DeltaRegionTracker) {
+        super()
+
         this._deltaTracker = deltaTracker
     }
 
@@ -149,8 +152,8 @@ export class NeovimScreen implements Screen {
 
         const currentCell = this._grid.getCell(x, y);
 
-        if(currentCell) {
-            if(currentCell.foregroundColor === cell.foregroundColor
+        if (currentCell) {
+            if (currentCell.foregroundColor === cell.foregroundColor
                 && currentCell.backgroundColor === cell.backgroundColor
                 && currentCell.character === cell.character)
                 return;
@@ -161,7 +164,7 @@ export class NeovimScreen implements Screen {
     }
 
     public dispatch(action: any): void {
-        switch(action.type) {
+        switch (action.type) {
             case Actions.CursorGotoType:
                 this._cursorRow = action.row
                 this._cursorColumn = action.col
@@ -171,18 +174,18 @@ export class NeovimScreen implements Screen {
                 var foregroundColor = this._currentHighlight.foregroundColor ? this._currentHighlight.foregroundColor : this._foregroundColor
                 var backgroundColor = this._currentHighlight.backgroundColor ? this._currentHighlight.backgroundColor : this._backgroundColor
 
-				if (this._currentHighlight.reverse) {
-					var temp = foregroundColor;
-					foregroundColor = backgroundColor
-					backgroundColor = foregroundColor
-				}
+                if (this._currentHighlight.reverse) {
+                    var temp = foregroundColor;
+                    foregroundColor = backgroundColor
+                    backgroundColor = foregroundColor
+                }
 
                 var characters = action.characters
 
                 var row = this._cursorRow
                 var col = this._cursorColumn
 
-                for(let i = 0; i < characters.length; i++) {
+                for (let i = 0; i < characters.length; i++) {
                     this._setCell(col + i, row, {
                         foregroundColor: foregroundColor,
                         backgroundColor: backgroundColor,
@@ -197,7 +200,7 @@ export class NeovimScreen implements Screen {
                 var backgroundColor = this._currentHighlight.backgroundColor ? this._currentHighlight.backgroundColor : this._backgroundColor
 
                 var row = this._cursorRow
-                for(let i = this._cursorColumn; i < this.width; i++) {
+                for (let i = this._cursorColumn; i < this.width; i++) {
                     this._setCell(i, row, {
                         foregroundColor: foregroundColor,
                         backgroundColor: backgroundColor,
@@ -232,7 +235,7 @@ export class NeovimScreen implements Screen {
             case Actions.SET_HIGHLIGHT:
                 this._currentHighlight.foregroundColor = action.foregroundColor
                 this._currentHighlight.backgroundColor = action.backgroundColor
-				this._currentHighlight.reverse = !!action.reverse
+                this._currentHighlight.reverse = !!action.reverse
                 break
             case Actions.SET_SCROLL_REGION:
                 this._scrollRegion = {
@@ -256,20 +259,27 @@ export class NeovimScreen implements Screen {
 
                 this._grid.setRegionFromGrid(regionToScroll, left, top)
                 this._notifyAllCellsModified()
+
+                this.emit("scroll", {
+                    top: top,
+                    bottom: bottom,
+                    left: left,
+                    right: right
+                }, count)
                 break
         }
     }
 
     private _notifyAllCellsModified(): void {
-        for(var x = 0; x < this.width; x++) {
-            for(var y = 0; y < this.height; y++) {
+        for (var x = 0; x < this.width; x++) {
+            for (var y = 0; y < this.height; y++) {
                 this._deltaTracker.notifyCellModified(x, y)
             }
         }
     }
 
     private _getScrollRegion(): ScrollRegion {
-        if(this._scrollRegion)
+        if (this._scrollRegion)
             return this._scrollRegion;
         else
             return {

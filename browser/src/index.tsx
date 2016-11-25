@@ -37,12 +37,17 @@ const start = (args: string[]) => {
     var deltaRegion = new IncrementalDeltaRegionTracker()
     var screen = new NeovimScreen(deltaRegion)
 
+
     const pluginManager = new PluginManager(screen, debugPlugin);
     var instance = new NeovimInstance(pluginManager, document.body.offsetWidth, document.body.offsetHeight, parsedArgs._);
 
     const canvasElement = document.getElementById("test-canvas") as HTMLCanvasElement
     var renderer = new CanvasRenderer()
     renderer.start(canvasElement)
+
+    screen.on("scroll", (region, count) => {
+        renderer.onScroll(screen, region, count)
+    })
 
     var cursor = new Cursor()
 
