@@ -106,6 +106,15 @@ export class TypeScriptServerHost extends events.EventEmitter {
         })
     }
 
+    public getDocumentHighlights(fullFilePath: string, line: number, col: number): Promise<any> {
+        return this._makeTssRequest<any>("documentHighlights", {
+            filesToSearch: [fullFilePath],
+            file: fullFilePath,
+            line: line,
+            offset: col
+        })
+    }
+
     public getCompletions(fullFilePath: string, line: number, col: number, prefix: string): Promise<any> {
         return this._makeTssRequest<void>("completions", {
             file: fullFilePath,
@@ -163,14 +172,6 @@ export class TypeScriptServerHost extends events.EventEmitter {
     public getErrorsAcrossProject(fullFilePath: string): Promise<void> {
         return this._makeTssRequest<void>("geterrForProject", {
             file: fullFilePath
-        });
-    }
-
-    public getDocumentHighlights(fullFilePath: string, lineNumber: number, offset: number): Promise<void> {
-        return this._makeTssRequest<void>("documentHighlights", {
-            file: fullFilePath,
-            line: lineNumber,
-            offset: offset
         });
     }
 

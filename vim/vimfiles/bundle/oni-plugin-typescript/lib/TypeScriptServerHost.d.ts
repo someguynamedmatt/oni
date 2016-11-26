@@ -12,6 +12,7 @@ export declare class TypeScriptServerHost extends events.EventEmitter {
     getProjectInfo(fullFilePath: string): void;
     getTypeDefinition(fullFilePath: string, line: number, col: number): Promise<void>;
     getFormattingEdits(fullFilePath: string, line: number, col: number, endLine: number, endCol: number): Promise<any>;
+    getDocumentHighlights(fullFilePath: string, line: number, col: number): Promise<any>;
     getCompletions(fullFilePath: string, line: number, col: number, prefix: string): Promise<any>;
     getCompletionDetails(fullFilePath: string, line: number, col: number, entryNames: string[]): Promise<any>;
     updateFile(fullFilePath: string, updatedContents: string): Promise<void>;
@@ -20,7 +21,6 @@ export declare class TypeScriptServerHost extends events.EventEmitter {
     getSignatureHelp(fullFilePath: string, line: number, col: number): Promise<void>;
     getErrors(fullFilePath: string): Promise<void>;
     getErrorsAcrossProject(fullFilePath: string): Promise<void>;
-    getDocumentHighlights(fullFilePath: string, lineNumber: number, offset: number): Promise<void>;
     _makeTssRequest<T>(commandName: string, args: any): Promise<T>;
     private _parseResponse(returnedData);
     private _createDeferredPromise<T>();

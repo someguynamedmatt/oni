@@ -95,6 +95,14 @@ var TypeScriptServerHost = (function (_super) {
             endOffset: endCol
         });
     };
+    TypeScriptServerHost.prototype.getDocumentHighlights = function (fullFilePath, line, col) {
+        return this._makeTssRequest("documentHighlights", {
+            filesToSearch: [fullFilePath],
+            file: fullFilePath,
+            line: line,
+            offset: col
+        });
+    };
     TypeScriptServerHost.prototype.getCompletions = function (fullFilePath, line, col, prefix) {
         return this._makeTssRequest("completions", {
             file: fullFilePath,
@@ -145,13 +153,6 @@ var TypeScriptServerHost = (function (_super) {
     TypeScriptServerHost.prototype.getErrorsAcrossProject = function (fullFilePath) {
         return this._makeTssRequest("geterrForProject", {
             file: fullFilePath
-        });
-    };
-    TypeScriptServerHost.prototype.getDocumentHighlights = function (fullFilePath, lineNumber, offset) {
-        return this._makeTssRequest("documentHighlights", {
-            file: fullFilePath,
-            line: lineNumber,
-            offset: offset
         });
     };
     TypeScriptServerHost.prototype._makeTssRequest = function (commandName, args) {
