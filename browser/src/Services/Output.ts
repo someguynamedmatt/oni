@@ -30,6 +30,7 @@ export class OutputWindow {
             .then(() => this._neovimInstance.getCurrentWindow())
             .then(() => this._neovimInstance.getCurrentBuffer())
             .then((buf) => buffer = buf)
+            .then(() => this._neovimInstance.command("AnsiEsc"))
             .then(() => buffer.setOption("buftype", "nofile"))
             .then(() => buffer.setOption("bufhidden", "hide"))
             .then(() => buffer.setOption("swapfile", false))
@@ -66,13 +67,16 @@ export class OutputWindow {
 
         this.write([shellCommand], buf)
 
-        const proc = spawn("npm.cmd", ["ls", "--color", "always"], <any>{
+        // const proc = spawn("git", ["-c", "color.status=always", "status"], <any>{
+        // const proc = spawn("npm.cmd", ["ls", "--color", "always"], <any>{
+        const proc = spawn("npm.cmd", ["run", "test", "--color", "always"], <any>{
             shell: true,
         })
 
         proc.stdout.on("data", (data) => {
             this.write(data.toString().split("\n"), buf)
         })
+
         proc.stderr.on("data", (data) => this.write(data.toString().split("\n"), buf))
         proc.on("close", (data) => {
             this.write([`process excited with code ${data}`], buf)
