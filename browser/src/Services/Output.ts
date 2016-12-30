@@ -1,4 +1,4 @@
-import { exec } from "child_process"
+import { spawn } from "child_process"
 import * as Q from "q"
 import { IBuffer } from "./../neovim/Buffer"
 import { INeovimInstance } from "./../NeovimInstance"
@@ -66,14 +66,13 @@ export class OutputWindow {
 
         this.write([shellCommand], buf)
 
-        const proc = exec(shellCommand, (err: any, _stdout: any, _stderr: any) => {
-            if (err) {
-                console.error(err)
-                deferred.reject(err)
-            }
+        const proc = spawn("npm.cmd", ["ls", "--color", "always"], <any>{
+            shell: true,
         })
 
-        proc.stdout.on("data", (data) => this.write(data.toString().split("\n"), buf))
+        proc.stdout.on("data", (data) => {
+            this.write(data.toString().split("\n"), buf)
+        })
         proc.stderr.on("data", (data) => this.write(data.toString().split("\n"), buf))
         proc.on("close", (data) => {
             this.write([`process excited with code ${data}`], buf)
