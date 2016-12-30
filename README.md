@@ -230,6 +230,7 @@ These are:
 - [typescript-vim](https://github.com/leafgarland/typescript-vim)
 - [vim-commentary](https://github.com/tpope/vim-commentary)
 - [vim-unimpaired](https://github.com/tpope/vim-unimpaired)
+- [AnsiEsc](https://github.com/vim-scripts/AnsiEsc)
 
 As well as some color-schemes:
 - [vim-monokai](https://github.com/sickill/vim-monokai)
