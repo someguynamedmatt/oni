@@ -199,11 +199,18 @@ Oni.registerLanguageService({
     getSignatureHelp,
 })
 
+const filesThatEverHadError = {}
+
 host.on("semanticDiag", (diagnostics) => {
 
     const fileName = diagnostics.file
 
     const diags = diagnostics.diagnostics || []
+
+    if (diags.length === 0 && !filesThatEverHadError[fileName])
+        return
+
+    filesThatEverHadError[fileName] = true
 
     const errors = diags.map((d) => {
         const lineNumber = d.start.line
