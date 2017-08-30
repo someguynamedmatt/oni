@@ -195,9 +195,13 @@ export class QuickOpen {
                 nodir: true,
                 ignore: Config.instance().getValue("oni.exclude"),
             }, (_err: any, files: string[]) => {
-                files.forEach( (f: string) => {
-                    this._loadedItems.push(new QuickOpenItem(f, QuickOpenType.file))
-                })
+                Log.error(_err)
+
+                if(files) {
+                    files.forEach( (f: string) => {
+                        this._loadedItems.push(new QuickOpenItem(f, QuickOpenType.file))
+                    })
+                }
                 this._showMenuFromQuickOpenItems(this._loadedItems)
             })
         })
