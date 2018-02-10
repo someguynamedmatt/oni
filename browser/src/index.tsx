@@ -3,7 +3,7 @@
  *
  * Entry point for the BrowserWindow process
  */
-
+import { Command } from "commander"
 import { ipcRenderer } from "electron"
 import * as minimist from "minimist"
 import * as path from "path"
@@ -13,6 +13,7 @@ import * as Utility from "./Utility"
 
 import { IConfigurationValues } from "./Services/Configuration/IConfigurationValues"
 
+const program = new Command()
 const start = async (args: string[]): Promise<void> => {
     Performance.startMeasure("Oni.Start")
 
@@ -228,8 +229,16 @@ const start = async (args: string[]): Promise<void> => {
 }
 
 ipcRenderer.on("init", (_evt: any, message: any) => {
+    program
+        .version("1.0.0")
+        .option("-h, --help", "help")
+        .parse(process.argv)
     process.chdir(message.workingDirectory)
-    start(message.args)
+    if (!program.help) {
+        start(message.args)
+    } else {
+        console.log("DUDEEEEE")
+    }
 })
 
 ipcRenderer.on("execute-command", async (_evt: any, command: string, arg?: any) => {
