@@ -10,9 +10,7 @@ import * as Oni from "oni-api"
 import { HighlightTextByIndex } from "./../../UI/components/HighlightText"
 // import { Visible } from "./../../UI/components/Visible"
 import { Icon, IconSize } from "./../../UI/Icon"
-
 import { focusManager } from "./../FocusManager"
-
 import { IMenuOptionWithHighlights, menuStore } from "./Menu"
 import * as ActionCreators from "./MenuActionCreators"
 import * as State from "./MenuState"
