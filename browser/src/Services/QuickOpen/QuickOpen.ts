@@ -34,7 +34,7 @@ export class QuickOpen {
     private _lastCommand: string | null = null
 
     constructor(menuManager: MenuManager, neovimInstance: INeovimInstance) {
-        console.log("DUDE constructor", menuManager, neovimInstance)
+        // console.log("DUDE constructor", menuManager, neovimInstance)
         this._neovimInstance = neovimInstance
 
         this._menu = menuManager.create()
@@ -202,8 +202,8 @@ export class QuickOpen {
 
     private _onItemSelected(selectedOption: Oni.Menu.MenuOption, openInSplit: string = ":e"): void {
         const arg = selectedOption
-        console.log("DUDE arg", arg)
-        console.log("DUDE cwd", process.cwd())
+        // console.log("DUDE arg", arg)
+        // console.log("DUDE cwd", process.cwd())
 
         if (arg.icon === QuickOpenItem.convertTypeToIcon(QuickOpenType.bookmarkHelp)) {
             commandManager.executeCommand("oni.config.openConfigJs")
@@ -215,9 +215,9 @@ export class QuickOpen {
             }
             this._neovimInstance.command(`${arg.label}`)
         } else {
-            console.log("DUDE arg.detail", arg.detail)
+            // console.log("DUDE arg.detail", arg.detail)
             let fullPath = path.join(arg.detail, arg.label)
-            console.log("DUDE fullPath", fullPath)
+            // console.log("DUDE fullPath", fullPath)
 
             this._seenItems.push(fullPath)
 
